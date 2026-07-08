@@ -210,6 +210,30 @@ namespace DocSharp.Binary.WordprocessingMLMapping
             }
         }
 
+        /// <summary>
+        /// Maps a binary tab stop justification code to the ST_TabJc enumeration used
+        /// by w:tab/@w:val. This is a distinct enumeration from paragraph justification:
+        /// code 3 is a decimal tab and code 6 is the list numbering tab ("num").
+        /// </summary>
+        protected string getTabJustification(byte jc)
+        {
+            switch (jc)
+            {
+                case 1:
+                    return "center";
+                case 2:
+                    return "right";
+                case 3:
+                    return "decimal";
+                case 4:
+                    return "bar";
+                case 6:
+                    return "num";
+                default:
+                    return "left";
+            }
+        }
+
         protected string getBorderType(byte type)
         {
             switch (type)
