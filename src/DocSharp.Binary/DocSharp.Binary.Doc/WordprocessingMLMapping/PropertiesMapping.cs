@@ -162,7 +162,7 @@ namespace DocSharp.Binary.WordprocessingMLMapping
             if (desc.cvBack != 0)
                 fill.Value = new RGBColor((int)desc.cvBack, RGBColor.ByteOrder.RedLast).SixDigitHexCode;
             else
-                fill.Value = desc.icoBack.ToString();
+                fill.Value = getHexColor(desc.icoBack);
             shd.Attributes.Append(fill);
 
             //foreground color
@@ -170,7 +170,7 @@ namespace DocSharp.Binary.WordprocessingMLMapping
             if (desc.cvFore != 0)
                 color.Value = new RGBColor((int)desc.cvFore, RGBColor.ByteOrder.RedFirst).SixDigitHexCode;
             else
-                color.Value = desc.icoFore.ToString();
+                color.Value = getHexColor(desc.icoFore);
             shd.Attributes.Append(color);
 
             //pattern
@@ -179,6 +179,59 @@ namespace DocSharp.Binary.WordprocessingMLMapping
             shd.Attributes.Append(val);
 
             parent.AppendChild(shd);
+        }
+
+        /// <summary>
+        /// Maps a Word color identifier to a six-digit hex code, as expected by
+        /// ST_HexColor attributes (w:shd/@w:fill and @w:color). "auto" and any
+        /// unknown identifier map to the literal "auto" value.
+        /// </summary>
+        protected string getHexColor(Global.ColorIdentifier color)
+        {
+            switch (color)
+            {
+                case Global.ColorIdentifier.black: return "000000";
+                case Global.ColorIdentifier.blue: return "0000FF";
+                case Global.ColorIdentifier.cyan: return "00FFFF";
+                case Global.ColorIdentifier.green: return "00FF00";
+                case Global.ColorIdentifier.magenta: return "FF00FF";
+                case Global.ColorIdentifier.red: return "FF0000";
+                case Global.ColorIdentifier.yellow: return "FFFF00";
+                case Global.ColorIdentifier.white: return "FFFFFF";
+                case Global.ColorIdentifier.darkBlue: return "000080";
+                case Global.ColorIdentifier.darkCyan: return "008080";
+                case Global.ColorIdentifier.darkGreen: return "008000";
+                case Global.ColorIdentifier.darkMagenta: return "800080";
+                case Global.ColorIdentifier.darkRed: return "800000";
+                case Global.ColorIdentifier.darkYellow: return "808000";
+                case Global.ColorIdentifier.darkGray: return "808080";
+                case Global.ColorIdentifier.lightGray: return "C0C0C0";
+                default: return "auto";
+            }
+        }
+
+        /// <summary>
+        /// Maps a binary tab stop justification code to the ST_TabJc enumeration used
+        /// by w:tab/@w:val. This is a distinct enumeration from paragraph justification:
+        /// code 3 is a decimal tab and code 6 is the list numbering tab ("num").
+        /// </summary>
+        protected string getTabJustification(byte jc)
+        {
+            switch (jc)
+            {
+                case 1:
+                    return "center";
+                case 2:
+                    return "right";
+                case 3:
+                    return "decimal";
+                case 4:
+                    return "bar";
+                case 6:
+                    return "num";
+                default:
+                    return "left";
+            }
         }
 
         protected string getBorderType(byte type)
@@ -249,7 +302,9 @@ namespace DocSharp.Binary.WordprocessingMLMapping
             switch (shd.ipat)
             {
                 case ShadingDescriptor.ShadingPattern.Automatic:
-                    pattern = "auto";
+                    // "auto" is not a valid value for w:shd/@w:val (ST_Shd enumeration);
+                    // "clear" indicates no pattern (fill color only), which is the correct default.
+                    pattern = "clear";
                     break;
                 case ShadingDescriptor.ShadingPattern.Solid:
                     pattern = "solid";
@@ -297,10 +352,13 @@ namespace DocSharp.Binary.WordprocessingMLMapping
                     pattern = "thinVertStripe";
                     break;
                 case ShadingDescriptor.ShadingPattern.DarkForwardDiagonal:
+                    pattern = "thinDiagStripe";
                     break;
                 case ShadingDescriptor.ShadingPattern.DarkBackwardDiagonal:
+                    pattern = "thinReverseDiagStripe";
                     break;
                 case ShadingDescriptor.ShadingPattern.DarkCross:
+                    pattern = "thinHorzCross";
                     break;
                 case ShadingDescriptor.ShadingPattern.DarkDiagonalCross:
                     pattern = "thinDiagCross";
@@ -312,10 +370,13 @@ namespace DocSharp.Binary.WordprocessingMLMapping
                     pattern = "vertStripe";
                     break;
                 case ShadingDescriptor.ShadingPattern.ForwardDiagonal:
+                    pattern = "diagStripe";
                     break;
                 case ShadingDescriptor.ShadingPattern.BackwardDiagonal:
+                    pattern = "reverseDiagStripe";
                     break;
                 case ShadingDescriptor.ShadingPattern.Cross:
+                    pattern = "horzCross";
                     break;
                 case ShadingDescriptor.ShadingPattern.DiagonalCross:
                     pattern = "diagCross";

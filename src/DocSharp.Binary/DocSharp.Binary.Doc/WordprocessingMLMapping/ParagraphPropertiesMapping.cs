@@ -351,7 +351,7 @@ namespace DocSharp.Binary.WordprocessingMLMapping
                             var tab = this._nodeFactory.CreateElement("w", "tab", OpenXmlNamespaces.WordprocessingML);
                             //justification
                             var tabsVal = this._nodeFactory.CreateAttribute("w", "val", OpenXmlNamespaces.WordprocessingML);
-                            tabsVal.Value = ((Global.JustificationCode)tbd.jc).ToString();
+                            tabsVal.Value = getTabJustification(tbd.jc);
                             tab.Attributes.Append(tabsVal);
                             //tab leader type
                             var leader = this._nodeFactory.CreateAttribute("w", "leader", OpenXmlNamespaces.WordprocessingML);

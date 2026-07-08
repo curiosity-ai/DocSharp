@@ -835,6 +835,11 @@ namespace DocSharp.Binary.WordprocessingMLMapping
                     this._writer.WriteAttributeString("w", "fldCharType", OpenXmlNamespaces.WordprocessingML, "separate");
                     this._writer.WriteEndElement();
 
+                    //text after the separator is the field result, not the field instruction
+                    this._writeInstrText = false;
+                    if (textType == "instrText")
+                        textType = "t";
+
                     writeTextStart(textType);
                 }
                 else if (c == TextMark.FieldEndMark)
