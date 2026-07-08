@@ -62,8 +62,23 @@ namespace DocSharp.Binary.WordprocessingMLMapping
                 this._writer.WriteEndElement();
 
                 //pitch
+                // w:pitch/@w:val is the ST_Pitch enumeration (default/fixed/variable),
+                // not a raw number. The pitch request (prq) is stored in the low 2 bits.
+                string pitch;
+                switch (font.prq & 0x03)
+                {
+                    case 1:
+                        pitch = "fixed";
+                        break;
+                    case 2:
+                        pitch = "variable";
+                        break;
+                    default:
+                        pitch = "default";
+                        break;
+                }
                 this._writer.WriteStartElement("w", "pitch", OpenXmlNamespaces.WordprocessingML);
-                this._writer.WriteAttributeString("w", "val", OpenXmlNamespaces.WordprocessingML, font.prq.ToString());
+                this._writer.WriteAttributeString("w", "val", OpenXmlNamespaces.WordprocessingML, pitch);
                 this._writer.WriteEndElement();
 
                 //truetype

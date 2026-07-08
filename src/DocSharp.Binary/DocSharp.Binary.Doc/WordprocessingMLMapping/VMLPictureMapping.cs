@@ -137,7 +137,10 @@ namespace DocSharp.Binary.WordprocessingMLMapping
         {
             this._writer.WriteStartElement("w10", name, OpenXmlNamespaces.OfficeWord);
             this._writer.WriteAttributeString("type", getBorderType(brc.brcType));
-            this._writer.WriteAttributeString("width", brc.dptLineWidth.ToString());
+            // The width attribute is a positive integer; omit it for borderless
+            // (type="none") pictures where the line width is 0, as 0 is invalid.
+            if (brc.dptLineWidth > 0)
+                this._writer.WriteAttributeString("width", brc.dptLineWidth.ToString());
             this._writer.WriteEndElement();
         }
 

@@ -44,7 +44,7 @@ namespace DocSharp.Binary.WordprocessingMLMapping
                 {
                     this._writer.WriteStartElement("w", "style", OpenXmlNamespaces.WordprocessingML);
 
-                    this._writer.WriteAttributeString("w", "type", OpenXmlNamespaces.WordprocessingML, style.stk.ToString());
+                    this._writer.WriteAttributeString("w", "type", OpenXmlNamespaces.WordprocessingML, getStyleType(style.stk));
 
                     if (style.sti != StyleSheetDescription.StyleIdentifier.Null && style.sti != StyleSheetDescription.StyleIdentifier.User)
                     {
@@ -189,6 +189,26 @@ namespace DocSharp.Binary.WordprocessingMLMapping
                 ret = ret.Replace("'", "");
                 ret = ret.Replace("\"", "");
                 return ret;
+            }
+        }
+
+        /// <summary>
+        /// Maps the binary style kind to the corresponding ST_StyleType value used by
+        /// w:style/@w:type. The "list" kind is represented as "numbering" in Open XML.
+        /// </summary>
+        private string getStyleType(StyleSheetDescription.StyleKind stk)
+        {
+            switch (stk)
+            {
+                case StyleSheetDescription.StyleKind.character:
+                    return "character";
+                case StyleSheetDescription.StyleKind.table:
+                    return "table";
+                case StyleSheetDescription.StyleKind.list:
+                    return "numbering";
+                case StyleSheetDescription.StyleKind.paragraph:
+                default:
+                    return "paragraph";
             }
         }
 
